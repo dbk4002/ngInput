@@ -1,0 +1,292 @@
+﻿<style>
+    .autocomplete-custom-template li {
+  border-bottom: 1px solid #ccc;
+  /* height: auto; */
+  padding-top: 8px;
+  padding-bottom: 8px;
+  white-space: normal;
+}
+.autocomplete-custom-template li:last-child {
+  border-bottom-width: 0;
+}
+.autocomplete-custom-template .item-title,
+.autocomplete-custom-template .item-metadata {
+  display: block;
+  line-height: 2;
+}
+.autocomplete-custom-template .item-title md-icon {
+  height: 18px;
+  width: 18px;
+}
+</style>
+
+<div id="input-container" class="inner-input-container" ng-show="(inputElementVar.showCondition==undefined? true : $eval(inputElementVar.showCondition)) && (!data[inputElementVar.modelName + '_inlineEdit'] || inputElementVar.type==4) ">
+    <div ng-if="inputElementVar.type==0">
+        <md-input-container class="md-block">
+            <label>{{inputElementVar.displayName}}  </label>
+            <input name="{{inputElementVar.modelName}}"
+                   ng-init="onElementInit(inputElementVar)" 
+                   ng-blur="onBlurElement(inputElementVar)"
+                   ng-required="$eval(inputElementVar.requiredCondition)" 
+                   ng-pattern="inputElementVar.validationRule" 
+                   minlength="{{inputElementVar.minLength}}" 
+                   md-maxlength="{{inputElementVar.maxLength}}" 
+                   ng-model="data[inputElementVar.modelName]" 
+                   ng-disabled="$eval(inputElementVar.disableCondition)" 
+                   ng-change="ngChangeOfInput(inputElementVar)"
+                   ng-keyup="onKeyUp($event,inputElementVar.modelName)"
+                   
+                   />
+            <div ng-messages="myForm.name.$error">
+                <div ng-message="minlength">
+                    This field should contain minimum {{inputElementVar.minLength}} characters.
+                </div>
+                <div ng-message="md-maxlength">
+                    This field should contain maximum {{inputElementVar.maxLength}} characters.
+                </div>
+                <div ng-message="pattern">
+                    {{inputElementVar.validationMsg}}
+                </div>
+            </div>
+        </md-input-container>
+       
+        <br/>
+    </div>
+
+    <div ng-if="inputElementVar.type==1">
+        <md-input-container class="md-block">
+            <label>{{inputElementVar.displayName}}</label>
+            <input name="{{inputElementVar.modelName}}"
+                   ng-model="data[inputElementVar.modelName]" 
+                   ng-init="onElementInit(inputElementVar)" 
+                   type="number" 
+                   ng-required="$eval(inputElementVar.requiredCondition)" 
+                   ng-disabled="$eval(inputElementVar.disableCondition)"
+                   ng-change="ngChangeOfInput(inputElementVar)"
+                   ng-blur="onBlurElement(inputElementVar)" />
+        </md-input-container>
+    </div>
+
+    <div ng-if="inputElementVar.type==2" layout="column" style="width:100%;">
+        <label for="dateField" style="color: rgba(125, 121, 121, 0.94);font-size: 13px;">{{inputElementVar.displayName}}</label>
+        <md-datepicker name="{{inputElementVar.modelName}}"
+                       ng-required="$eval(inputElementVar.requiredCondition)" 
+                       md-placeholder="{{inputElementVar.displayName}}" 
+                       ng-model="data[inputElementVar.modelName]"
+                       ng-init="onElementInit(inputElementVar)" 
+                       ng-blur="onBlurElement(inputElementVar)"
+                       id="dateField" 
+                       ng-disabled="$eval(inputElementVar.disableCondition)"  
+                       md-open-on-focus=""></md-datepicker>
+    </div>
+
+    <div ng-if="inputElementVar.type==3 && !inputElementVar.isSearchable" style="width:100%;">
+        <md-input-container class="md-block" style="width:90%;">
+            <label>{{inputElementVar.displayName}}</label>
+            <md-select name="{{inputElementVar.modelName}}" 
+                       ng-model="data[inputElementVar.modelName]" 
+                       ng-required="$eval(inputElementVar.requiredCondition)" 
+                       ng-disabled="$eval(inputElementVar.disableCondition)" 
+                       ng-init="data[inputElementVar.modelName] = toNumber(inputElementVar.defaultValue)">
+                <md-option ng-repeat="option in inputElementVar.options" 
+                           value="{{option.value}}">
+                    {{option.key}}
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
+
+    <div ng-if="inputElementVar.type==3 && inputElementVar.isSearchable && inputElementVar.multiple">
+        <md-input-container style="width:99%;">
+            <label>{{inputElementVar.displayName}}</label>
+            <md-select ng-model="data[inputElementVar.modelName]"
+                       name="{{inputElementVar.modelName}}"
+                       data-md-container-class="selectdemoSelectHeader"
+                       ng-required="$eval(inputElementVar.requiredCondition)"
+                       ng-disabled="$eval(inputElementVar.disableCondition)"
+                       multiple="true"
+                       ng-init="data[inputElementVar.modelName] = toNumber(inputElementVar.defaultValue)">
+                <md-select-header class="demo-select-header">
+                    <input ng-model="data[inputElementVar.modelName + '_searchterm']"
+                           type="search"
+                           placeholder="Search for a {{inputElementVar.displayName}}.."
+                           class="demo-header-searchbox md-text"
+                           onkeydown="mdSelectOnKeyDownOverride(event)">
+                </md-select-header>
+                <md-optgroup label="{{inputElementVar.displayName}}">
+                    <md-option ng-value="option.value" ng-repeat="option in inputElementVar.options |filter:data[inputElementVar.modelName + '_searchterm']">{{option.key}}</md-option>
+                </md-optgroup>
+            </md-select>
+            <div class="errors" ng-messages="myForm[inputElementVar.modelName].$error">
+                <div ng-message="required">Required</div>
+            </div>
+        </md-input-container>
+    </div>
+    <div ng-if="inputElementVar.type==3 && inputElementVar.isSearchable && !inputElementVar.multiple">
+        <md-input-container style="width:99%;">
+            <label>{{inputElementVar.displayName}}</label>
+            <md-select ng-model="data[inputElementVar.modelName]"
+                       name="{{inputElementVar.modelName}}"
+                       data-md-container-class="selectdemoSelectHeader"
+                       ng-required="$eval(inputElementVar.requiredCondition)"
+                       ng-disabled="$eval(inputElementVar.disableCondition)"
+                       ng-init="onElementInit(inputElementVar)" 
+                       ng-blur="onBlurElement(inputElementVar)"
+                       ng-change="ngChangeOfInput(inputElementVar)">
+                <md-select-header class="demo-select-header">
+                    <input ng-model="data[inputElementVar.modelName + '_searchterm']"
+                           type="search"
+                           placeholder="Search for a {{inputElementVar.displayName}}.."
+                           class="demo-header-searchbox md-text"
+                           onkeydown="mdSelectOnKeyDownOverride(event)">
+                </md-select-header>
+                <md-optgroup label="{{inputElementVar.displayName}}">
+                    <md-option ng-value="option.value" ng-repeat="option in inputElementVar.options |filter:data[inputElementVar.modelName + '_searchterm']">{{option.key}}</md-option>
+                </md-optgroup>
+            </md-select>
+            <div class="errors" ng-messages="myForm[inputElementVar.modelName].$error">
+                <div ng-message="required">Required</div>
+            </div>
+        </md-input-container>
+    </div>
+    <div ng-if="inputElementVar.type==4" style="padding-left: 15px;">
+        <md-checkbox name="{{inputElementVar.modelName}}"
+                     ng-model="data[inputElementVar.modelName]"
+                     aria-label="{{inputElementVar.name}}"
+                     ng-required="$eval(inputElementVar.requiredCondition)"
+                     ng-disabled="$eval(inputElementVar.disableCondition) || data[inputElementVar.modelName + '_inlineEdit']"
+                     ng-init="onElementInit(inputElementVar)" 
+                     ng-blur="onBlurElement(inputElementVar)"
+                     ng-dblclick="onDoubleClick(inputElementVar)"
+                     > <label>{{inputElementVar.displayName}}</label></md-checkbox>
+       
+    </div>
+    <div ng-if="inputElementVar.type==5">
+        <label for="dateField" style="width: 91px;color: rgba(125, 121, 121, 0.94);padding-left: 0px;font-size: 13px;">{{inputElementVar.displayName}}</label>
+        <md-radio-group name="{{inputElementVar.modelName}}"
+                        ng-model="data[inputElementVar.modelName]"
+                        layout="row"
+                        ng-init="onElementInit(inputElementVar)" 
+                       ng-blur="onBlurElement(inputElementVar)"
+                       ng-change="ngChangeOfInput(inputElementVar)" >
+            <md-radio-button ng-repeat="option in inputElementVar.options" ng-value="{{option.value}}" class="md-accent">{{option.key}}</md-radio-button>
+        </md-radio-group>
+    </div>
+    <div ng-if="inputElementVar.type==7">
+        <label for="dateField" style="width: 91px;color: rgba(125, 121, 121, 0.94);padding-left: 0px;font-size: 13px;">{{inputElementVar.displayName}}</label>
+        <div>
+            <md-autocomplete md-input-name="{{inputElementVar.modelName}}"
+                             name="{{inputElementVar.modelName}}"
+                             ng-init="onElementInit(inputElementVar)" 
+                             ng-blur="onBlurElement(inputElementVar)"
+                             ng-disabled="$eval(inputElementVar.disableCondition)"
+                             md-no-cache="false"
+                             md-selected-item="data[inputElementVar.modelName + '_selectedItem']"
+                             md-search-text-change="searchTextChange(data[inputElementVar.modelName + '_searchText'],inputElementVar)"
+                             md-search-text="data[inputElementVar.modelName + '_searchText']"
+                             md-selected-item-change="selectedItemChange(item,inputElementVar)"
+                             md-items="item in querySearch(data[inputElementVar.modelName + '_searchText'],inputElementVar)"
+                             md-item-text="item[inputElementVar.lookupDisplayName]"
+                             md-min-length="0"
+                             placeholder="{{inputElementVar.placeholder}}"
+                             md-menu-class="autocomplete-custom-template"
+                             ng-required="$eval(inputElementVar.requiredCondition)">
+                <md-item-template layout="column">
+                    <span class="item-title">
+                        <img src="{{item[inputElementVar.lookupImage]}}" height="25" width="25" style="border-radius: 50%;" />
+                        <span> <strong style="font-weight: bold;">{{item[inputElementVar.lookupDisplayName]}}</strong> </span>
+                    </span>
+                    <span class="item-metadata" ng-if="item[inputElementVar.lookupDiscName]!=undefined && item[inputElementVar.lookupDiscName]!=''">
+                        <span class="item-metastat">
+                           Description:
+                        </span>
+                        <span class="item-metastat">
+                            {{item[inputElementVar.lookupDiscName]}}
+                        </span>
+                    </span>
+                </md-item-template>
+            </md-autocomplete>
+        </div>
+    </div>
+    <div ng-if="inputElementVar.type==8">
+        <md-switch name="{{inputElementVar.modelName}}"
+                   ng-model="data[inputElementVar.modelName]" aria-label="{{inputElementVar.displayName}}"
+                   ng-init="onElementInit(inputElementVar)" 
+                       ng-blur="onBlurElement(inputElementVar)">
+            {{inputElementVar.displayName}}
+        </md-switch>
+    </div>
+    <div ng-if="inputElementVar.type==9">
+        <md-slider name="{{inputElementVar.modelName}}"
+                   flex class="md-accent"
+                   id="{{inputElementVar.modelName}}_id"
+                   md-discrete
+                   ng-model="data[inputElementVar.modelName]"
+                   ng-init="onElementInit(inputElementVar)" 
+                   ng-blur="onBlurElement(inputElementVar)"
+                   onblur="alert('slider blur')"
+                   step="{{inputElementVar.step}}"
+                   min="{{inputElementVar.minLength}}"
+                   max="{{inputElementVar.maxLength}}"
+                   aria-label="{{inputElementVar.displayName}}"
+                   >
+        </md-slider>
+    </div>
+    <div ng-if="inputElementVar.type==10" onblur="console.log('onblur div');" onfocus="console.log('onfocus div');">
+        <label>{{inputElementVar.displayName}}</label>
+        <md-contact-chips name="{{inputElementVar.modelName}}"
+                         ng-init="onElementInit(inputElementVar)" 
+                         ng-blur="onBlurElement(inputElementVar)"
+                          ng-model="data[inputElementVar.modelName]"
+                          md-contacts="querySearch($query,inputElementVar)"
+                          md-contact-name="{{inputElementVar.lookupDisplayName}}"
+                          md-contact-image="{{inputElementVar.lookupImage}}"
+                          md-contact-email="{{inputElementVar.lookupDiscName}}"
+                          md-require-match="true"
+                          md-highlight-flags="i"
+                          filter-selected="true"
+                          placeholder="{{inputElementVar.placeholder}}"
+                          secondary-placeholder="+ {{inputElementVar.displayName}}"
+                          >
+        </md-contact-chips>
+    </div>
+</div>
+<div id="input-container" class="inner-input-container" ng-show="(inputElementVar.showCondition==undefined? true : $eval(inputElementVar.showCondition)) && data[inputElementVar.modelName + '_inlineEdit']">
+    
+    <div layout="row">
+        <div layout="column">
+            <div>
+                {{inputElementVar.displayName}}
+            </div>
+            <div>
+                <div ng-if="inputElementVar.type==2">
+                    {{data[inputElementVar.modelName] | date : 'MM/dd/yyyy'}}
+                </div>
+                <div ng-if="inputElementVar.type==3 || inputElementVar.type==5">
+                    {{data[inputElementVar.modelName + '_displayValue']}}
+                </div>
+                <div ng-if="inputElementVar.type==7">
+                    {{data[inputElementVar.modelName + '_displayValue']}}
+                </div>
+                <div ng-if="inputElementVar.type==10">
+                    <md-chips ng-repeat="item in data[inputElementVar.modelName]">
+                        <md-chip>{{item[inputElementVar.lookupDisplayName]}}</md-chip>
+                    </md-chips>
+                </div>
+               
+                <div ng-if="inputElementVar.type!=2 && inputElementVar.type!=3&& inputElementVar.type!=5 && inputElementVar.type!=7 && inputElementVar.type!=10">
+                    {{data[inputElementVar.modelName]}}
+                </div>
+            </div>
+        </div>
+        <div>
+            <md-button class="md-icon-button" aria-label="edit" ng-click="onEditClick(inputElementVar)">
+                <md-icon md-svg-icon="image:edit"></md-icon>
+               
+            </md-button>
+            <md-button class="md-icon-button" aria-label="edit" ng-click="undo(inputElementVar)" ng-show="showUndoActionFn(inputElementVar)">
+                <md-icon md-svg-icon="av:replay"></md-icon>
+            </md-button>
+        </div>
+    </div>
+</div>

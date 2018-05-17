@@ -1,0 +1,46 @@
+﻿<html>
+<head> 
+	<style>
+	.layout-row {
+		padding: 5px;
+	}
+	.layout-column {
+		 padding: 5px;
+	}
+	</style>
+    <script src="Resources/online/angular.js"></script>
+    <script src="Resources/online/angular-route.js"></script>
+    <script src="Resources/online/angular-animate.js"></script>
+    <script src="Resources/online/angular-material.js"></script>
+    <script src="Resources/online/angular-aria.js"></script>
+    <script src="Resources/online/angular-messages.js"></script>
+    <script src="Resources/online/angular-resource.js"></script>
+    <script src="Resources/CommonService.js"></script>
+    <script src="Resources/NgApp_Application.js"></script>
+    <link href="Resources/online/angular-material.css" rel="stylesheet">
+    <script src="Resources/nginput/ngInputElement.js"></script>
+    <script src="Resources/nginput/ngInputForm.js"></script>
+</head>
+<body ng-app="myApp" ng-controller="MyController">
+	<md-toolbar class="md-hue-2">
+      <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="Settings" ng-disabled="true">
+          <md-icon md-svg-icon="image:view_compact"></md-icon>
+        </md-button>
+
+        <h2 flex md-truncate>NgInput Demo</h2>
+
+       
+      </div>
+    </md-toolbar>
+    <md-content>
+		<md-switch name="inlineMode"
+                   ng-model="isInline">
+            Inline Mode
+        </md-switch>
+        <ng-input-form name="{{formdata.name}}" ng-if="isInline" sections="formdata.sections" configdata="dataEdit"></ng-input-form>
+		<ng-input-form name="{{formdata.name}}" ng-if="!isInline" sections="formdata.sections" configdata="data"></ng-input-form>
+       
+    </md-content>
+</body>
+</html>

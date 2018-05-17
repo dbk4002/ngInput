@@ -1,0 +1,12 @@
+﻿<form name="{{name}}">
+    <div ng-repeat="section in sections">
+        <ng-input-section 
+                          title="{{section.title}}" 
+                          id="{{section.id}}" 
+                          elements="section.elements" 
+                          columns="{{section.columns}}" 
+                          configdata="data"
+                          form-name="{{name}}">
+        </ng-input-section>
+    </div>
+</form>
